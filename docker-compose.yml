@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: atri-rpa-api:local
+    env_file:
+      - .env.docker
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - conference_downloads:/app/data/conference_downloads
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    image: atri-rpa-web:local
+    env_file:
+      - .env.docker
+    environment:
+      DASHBOARD_API_BASE_URL: ${DASHBOARD_API_BASE_URL:-http://10.255.172.58:8000}
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  conference_downloads:

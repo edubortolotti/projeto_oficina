@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model OrdemServico {
+  id          Int      @id @default(autoincrement())
+  numero      String   @unique @db.VarChar(50)
+  seguradora  String   @db.VarChar(120)
+  statusAtual String?  @db.VarChar(80)
+  dadosApi    Json?
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  consolidacoes Consolidacao[]
+
+  @@map("ordens_servico")
+}
+
+model Consolidacao {
+  id                  Int      @id @default(autoincrement())
+  ordemServicoId      Int?
+  os                  String   @unique @db.VarChar(50)
+  seguradora           String   @db.VarChar(120)
+  statusConsolidacao  String   @db.VarChar(80)
+  acaoSugerida        String   @db.VarChar(80)
+  dadosConference     Json?
+  dadosExtraidos      Json?
+  validacoes          Json
+  erros               Json?
+  resultadoJson       Json
+  ativoConferencia    Boolean  @default(true)
+  sincronizadoEm      DateTime?
+  criadoEm            DateTime @default(now())
+  atualizadoEm        DateTime @updatedAt
+
+  ordemServico OrdemServico? @relation(fields: [ordemServicoId], references: [id])
+
+  @@index([statusConsolidacao])
+  @@index([acaoSugerida])
+  @@map("consolidacoes")
+}
+
+model DecisaoHumana {
+  id             Int      @id @default(autoincrement())
+  os             String   @db.VarChar(50)
+  decisao        String   @db.VarChar(80)
+  observacao     String?  @db.Text
+  responsavel    String?  @db.VarChar(120)
+  dadosDecisao   Json?
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  @@index([os])
+  @@index([decisao])
+  @@map("decisoes_humanas")
+}
+
+model Fechamento {
+  id                Int      @id @default(autoincrement())
+  os                String   @db.VarChar(50)
+  decisao           String   @db.VarChar(80)
+  statusFechamento  String   @db.VarChar(80)
+  valorAprovado     Decimal? @db.Decimal(12, 2)
+  ocorrencias       Json?
+  anexos            Json?
+  respostaApi       Json?
+  erro              String?  @db.Text
+  criadoEm          DateTime @default(now())
+  atualizadoEm      DateTime @updatedAt
+
+  @@index([os])
+  @@index([statusFechamento])
+  @@map("fechamentos")
+}

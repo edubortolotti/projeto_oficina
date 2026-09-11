@@ -1,0 +1,26 @@
+-- DDL da tabela portais_senhas
+CREATE TABLE `portais_senhas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `seguradoraId` int(11) DEFAULT NULL,
+  `portalNome` varchar(120) NOT NULL,
+  `portalUrl` varchar(255) DEFAULT NULL,
+  `usuario` varchar(180) NOT NULL,
+  `senhaCriptografada` text NOT NULL,
+  `senhaIv` varchar(32) NOT NULL,
+  `senhaTag` varchar(32) NOT NULL,
+  `observacao` text DEFAULT NULL,
+  `ativo` tinyint(1) NOT NULL DEFAULT 1,
+  `criadoEm` datetime NOT NULL DEFAULT current_timestamp(),
+  `atualizadoEm` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `empresaId` int(11) DEFAULT NULL,
+  `segmento` varchar(80) DEFAULT NULL,
+  `empresaNome` varchar(180) DEFAULT NULL,
+  `cnpj` varchar(14) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `portais_senhas_seguradoraId_idx` (`seguradoraId`),
+  KEY `portais_senhas_portalNome_idx` (`portalNome`),
+  KEY `portais_senhas_empresaId_idx` (`empresaId`),
+  KEY `portais_senhas_empresa_seguradora_idx` (`empresaId`,`seguradoraId`),
+  CONSTRAINT `portais_senhas_empresaId_fkey` FOREIGN KEY (`empresaId`) REFERENCES `empresas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `portais_senhas_seguradoraId_fkey` FOREIGN KEY (`seguradoraId`) REFERENCES `seguradoras` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
